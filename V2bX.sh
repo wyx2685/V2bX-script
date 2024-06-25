@@ -778,26 +778,20 @@ EOF
   "route": {
     "rules": [
       {
-        "outbound": "block",
-        "geoip": [
-          "private"
-        ]
+        "ip_is_private": true,
+        "outbound": "block"
       },
       {
-        "geosite": [
-          "google"
+        "rule_set": [
+          "geosite-google"
         ],
         "outbound": "direct"
       },
       {
-        "geosite": [
-          "cn"
-        ],
-        "outbound": "block"
-      },
-      {
-        "geoip": [
-          "cn"
+        "rule_set": [
+          "geosite-category-ads-all",
+          "geosite-cn",
+          "geoip-cn"
         ],
         "outbound": "block"
       },
@@ -834,7 +828,42 @@ EOF
           "udp","tcp"
         ]
       }
+    ],
+    "rule_set": [
+      {
+        "tag": "geoip-cn",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "geosite-cn",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-cn.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "geosite-category-ads-all",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-category-ads-all.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "geosite-google",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-google.srs",
+        "download_detour": "direct"
+      }
     ]
+  },
+  "experimental": {
+    "cache_file": {
+      "enabled": true
+    }
   }
 }
 EOF
