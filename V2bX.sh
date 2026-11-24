@@ -96,7 +96,7 @@ before_show_menu() {
 }
 
 install() {
-    bash <(curl -Ls https://raw.githubusercontent.com/wyx2685/V2bX-script/master/install.sh)
+    bash <(curl -Ls https://raw.githubusercontent.com/proxynav/V2bX-script/master/install.sh)
     if [[ $? == 0 ]]; then
         if [[ $# == 0 ]]; then
             start
@@ -112,7 +112,7 @@ update() {
     else
         version=$2
     fi
-    bash <(curl -Ls https://raw.githubusercontent.com/wyx2685/V2bX-script/master/install.sh) $version
+    bash <(curl -Ls https://raw.githubusercontent.com/proxynav/V2bX-script/master/install.sh) $version
     if [[ $? == 0 ]]; then
         echo -e "${green}更新完成，已自动重启 V2bX，请使用 V2bX log 查看运行日志${plain}"
         exit
@@ -300,7 +300,7 @@ install_bbr() {
 }
 
 update_shell() {
-    wget -O /usr/bin/V2bX -N --no-check-certificate https://raw.githubusercontent.com/wyx2685/V2bX-script/master/V2bX.sh
+    wget -O /usr/bin/V2bX -N --no-check-certificate https://raw.githubusercontent.com/proxynav/V2bX-script/master/V2bX.sh
     if [[ $? != 0 ]]; then
         echo ""
         echo -e "${red}下载脚本失败，请检查本机能否连接 Github${plain}"
@@ -424,21 +424,17 @@ show_V2bX_version() {
 
 add_node_config() {
     echo -e "${green}请选择节点核心类型：${plain}"
-    echo -e "${green}1. xray${plain}"
-    echo -e "${green}2. singbox${plain}"
-    echo -e "${green}3. hysteria2${plain}"
+    echo -e "${green}1. singbox${plain}"
+    echo -e "${green}2. hysteria2${plain}"
     read -rp "请输入：" core_type
     if [ "$core_type" == "1" ]; then
-        core="xray"
-        core_xray=true
-    elif [ "$core_type" == "2" ]; then
         core="sing"
         core_sing=true
-    elif [ "$core_type" == "3" ]; then
+    elif [ "$core_type" == "2" ]; then
         core="hysteria2"
         core_hysteria2=true
     else
-        echo "无效的选择。请选择 1 2 3。"
+        echo "无效的选择。请选择 1 2。"
         continue
     fi
     while true; do
@@ -451,7 +447,7 @@ add_node_config() {
         fi
     done
 
-    if [ "$core_hysteria2" = true ] && [ "$core_xray" = false ] && [ "$core_sing" = false ]; then
+    if [ "$core_hysteria2" = true ] && [ "$core_sing" = false ]; then
         NodeType="hysteria2"
     else
         echo -e "${yellow}请选择节点传输协议：${plain}"
@@ -519,39 +515,7 @@ add_node_config() {
         listen_ip="::"
     fi
     node_config=""
-    if [ "$core_type" == "1" ]; then 
-    node_config=$(cat <<EOF
-{
-            "Core": "$core",
-            "ApiHost": "$ApiHost",
-            "ApiKey": "$ApiKey",
-            "NodeID": $NodeID,
-            "NodeType": "$NodeType",
-            "Timeout": 30,
-            "ListenIP": "0.0.0.0",
-            "SendIP": "0.0.0.0",
-            "DeviceOnlineMinTraffic": 200,
-            "MinReportTraffic": 0,
-            "EnableProxyProtocol": false,
-            "EnableUot": true,
-            "EnableTFO": true,
-            "DNSType": "UseIPv4",
-            "CertConfig": {
-                "CertMode": "$certmode",
-                "RejectUnknownSni": false,
-                "CertDomain": "$certdomain",
-                "CertFile": "/etc/V2bX/fullchain.cer",
-                "KeyFile": "/etc/V2bX/cert.key",
-                "Email": "v2bx@github.com",
-                "Provider": "cloudflare",
-                "DNSEnv": {
-                    "EnvName": "env1"
-                }
-            }
-        },
-EOF
-)
-    elif [ "$core_type" == "2" ]; then
+    if [ "$core_type" == "1" ]; then
     node_config=$(cat <<EOF
 {
             "Core": "$core",
@@ -581,7 +545,7 @@ EOF
         },
 EOF
 )
-    elif [ "$core_type" == "3" ]; then
+    elif [ "$core_type" == "2" ]; then
     node_config=$(cat <<EOF
 {
             "Core": "$core",
@@ -629,7 +593,6 @@ generate_config_file() {
     
     nodes_config=()
     first_node=true
-    core_xray=false
     core_sing=false
     fixed_api_info=false
     check_api=false
@@ -659,20 +622,6 @@ generate_config_file() {
 
     # 初始化核心配置数组
     cores_config="["
-
-    # 检查并添加xray核心配置
-    if [ "$core_xray" = true ]; then
-        cores_config+="
-    {
-        \"Type\": \"xray\",
-        \"Log\": {
-            \"Level\": \"error\",
-            \"ErrorPath\": \"/etc/V2bX/error.log\"
-        },
-        \"OutboundConfigPath\": \"/etc/V2bX/custom_outbound.json\",
-        \"RouteConfigPath\": \"/etc/V2bX/route.json\"
-    },"
-    fi
 
     # 检查并添加sing核心配置
     if [ "$core_sing" = true ]; then
@@ -962,7 +911,7 @@ show_usage() {
 show_menu() {
     echo -e "
   ${green}V2bX 后端管理脚本，${plain}${red}不适用于docker${plain}
---- https://github.com/wyx2685/V2bX ---
+--- https://github.com/proxynav/V2bX ---
   ${green}0.${plain} 修改配置
 ————————————————
   ${green}1.${plain} 安装 V2bX
